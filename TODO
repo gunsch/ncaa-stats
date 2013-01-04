@@ -1,0 +1,8 @@
+TODOs
+
+Assertion system on scraper to verify that assumptions are still holding, or to
+die and print out why (or, once automated, fire off an email about it).
+
+Scraper is getting a bit long. Split into task-level methods and have a more
+straightforward main method.
+
