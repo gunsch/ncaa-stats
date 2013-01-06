@@ -14,6 +14,7 @@
 # TODO this file has become a little long. Linear is okay but add a main/split
 #      into smaller functions, especially since each section is well-contained
 
+#from bs4 import BeautifulSoup as Soup
 from BeautifulSoup import BeautifulSoup as Soup
 from collections import defaultdict
 from soupselect import select
@@ -298,6 +299,21 @@ for player in players:
       players[player]['fouls'],
       players[player]['minutes'],
   )
+
+
+fga = 0
+offensive_rebounds = 0
+turnovers = 0
+ft_attempts = 0
+for player in players:
+  fga = fga + players[player]['2pa'] + players[player]['3pa']
+  offensive_rebounds = offensive_rebounds + players[player]['oreb']
+  turnovers = turnovers + players[player]['turnovers']
+  ft_attempts = ft_attempts + players[player]['fta']
+
+tempo = fga - offensive_rebounds + turnovers + 0.475 * ft_attempts
+print "tempo: ", tempo / 2
+
 
 
 
