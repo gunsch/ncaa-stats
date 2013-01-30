@@ -34,7 +34,7 @@ def get_seconds(time_string):
   return int(minutes) * 60 + int(seconds)
 
 def closest(word_list, word):
-  matches = difflib.get_close_matches(word, word_list, 1, 0.6)
+  matches = difflib.get_close_matches(word, word_list, 1, 0.8)
   if len(matches) > 0:
     return matches[0]
   return word
@@ -269,19 +269,19 @@ for player_data in boxscore_data:
 
   player['minutes'] = player_data['minutes']
 
-  # ensure_equals(player['points'], player_data['pts'], 'Point discrepancy for %s' % player_name)
-  # ensure_equals(player['3pa'], player_data['tpa'], '3pa discrepancy for %s' % player_name)
-  # ensure_equals(player['3pm'], player_data['tpm'], '3pm discrepancy for %s' % player_name)
-  # ensure_equals(player['fta'], player_data['fta'], 'FTa discrepancy for %s' % player_name)
-  # ensure_equals(player['ftm'], player_data['ftm'], 'FTm discrepancy for %s' % player_name)
-  # ensure_equals(player['2pa'], player_data['fga'] - player_data['tpa'], '2pa discrepancy for %s' % player_name)
-  # ensure_equals(player['2pm'], player_data['fgm'] - player_data['tpm'], '2pm discrepancy for %s' % player_name)
-  # ensure_equals(player['blocks'], player_data['blk'], 'blocks discrepancy for %s' % player_name)
-  # ensure_equals(player['fouls'], player_data['pf'], 'fouls discrepancy for %s' % player_name)
-  # ensure_equals(player['steals'], player_data['stl'], 'steals discrepancy for %s' % player_name)
-  # #[ensure_equals(player['assists'], player_data['ast'], 'assists discrepancy for %s' % player_name)
-  # ensure_equals(player['oreb'], player_data['oreb'], 'oreb discrepancy for %s' % player_name)
-  # ensure_equals(player['dreb'], player_data['reb'] - player_data['oreb'], 'dreb discrepancy for %s' % player_name)
+  ensure_equals(player['points'], player_data['pts'], 'Point discrepancy for %s' % player_name)
+  ensure_equals(player['3pa'], player_data['tpa'], '3pa discrepancy for %s' % player_name)
+  ensure_equals(player['3pm'], player_data['tpm'], '3pm discrepancy for %s' % player_name)
+  ensure_equals(player['fta'], player_data['fta'], 'FTa discrepancy for %s' % player_name)
+  ensure_equals(player['ftm'], player_data['ftm'], 'FTm discrepancy for %s' % player_name)
+  ensure_equals(player['2pa'], player_data['fga'] - player_data['tpa'], '2pa discrepancy for %s' % player_name)
+  ensure_equals(player['2pm'], player_data['fgm'] - player_data['tpm'], '2pm discrepancy for %s' % player_name)
+  ensure_equals(player['blocks'], player_data['blk'], 'blocks discrepancy for %s' % player_name)
+  ensure_equals(player['fouls'], player_data['pf'], 'fouls discrepancy for %s' % player_name)
+  ensure_equals(player['steals'], player_data['stl'], 'steals discrepancy for %s' % player_name)
+  ensure_equals(player['assists'], player_data['ast'], 'assists discrepancy for %s' % player_name)
+  ensure_equals(player['oreb'], player_data['oreb'], 'oreb discrepancy for %s' % player_name)
+  ensure_equals(player['dreb'], player_data['reb'] - player_data['oreb'], 'dreb discrepancy for %s' % player_name)
 
 
 
