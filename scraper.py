@@ -9,7 +9,6 @@
 # TODO figure out where Arizona/Colorado player entries are coming from
 # TODO add team name to players (boxscore)
 # TODO allow specifying games.
-# TODO count assists from play-by-play.
 # TODO databases.
 # TODO this file has become a little long. Linear is okay but add a main/split
 #      into smaller functions, especially since each section is well-contained
@@ -196,8 +195,6 @@ for event in game_data:
   # Ignored events
   timeout = re.search(r'^(.*) full timeout\.$', action, re_flags)
   jump_ball = re.search(r'^jump ball won by (.*)\.$', action, re_flags)
-
-  # TODO count assists!
 
   if free_throw:
     player, missed_or_made = free_throw.groups()
