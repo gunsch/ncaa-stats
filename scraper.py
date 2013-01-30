@@ -14,7 +14,6 @@
 # TODO this file has become a little long. Linear is okay but add a main/split
 #      into smaller functions, especially since each section is well-contained
 
-#from bs4 import BeautifulSoup as Soup
 from BeautifulSoup import BeautifulSoup as Soup
 from collections import defaultdict
 from soupselect import select
@@ -186,8 +185,8 @@ for event in game_data:
 
   # Events added to player
   free_throw = re.search(r'^(.*) (missed|made) free throw\.$', action, re_flags)
-  three_point = re.search(r'^(.*) (missed|made) three point jumper\.', action, re_flags)
-  two_point = re.search(r'^(.*) (missed|made) (?:jumper|layup|tip shot|dunk)\.', action, re_flags)
+  three_point = re.search(r'^(.*) (missed|made) three point jumper\.\s*(?:Assisted by (.*)\.)?$', action, re_flags)
+  two_point = re.search(r'^(.*) (missed|made) (?:jumper|layup|tip shot|dunk)\.\s*(?:Assisted by (.*)\.)?$', action, re_flags)
   rebound = re.search(r'^(.*) (defensive|offensive) rebound\.$', action, re_flags)
   foul = re.search(r'^foul on (.*)$', action, re_flags)
   block = re.search(r'^(.*) block\.$', action, re_flags)
@@ -209,19 +208,23 @@ for event in game_data:
     continue
 
   if three_point:
-    player, missed_or_made = three_point.groups()
+    player, missed_or_made, assist = three_point.groups()
     inc(player, '3pa')
     if missed_or_made == 'made':
       inc(player, '3pm')
       inc(player, 'points', 3)
+    if assist != None:
+      inc(assist, 'assists')
     continue
 
   if two_point:
-    player, missed_or_made = two_point.groups()
+    player, missed_or_made, assist = two_point.groups()
     inc(player, '2pa')
     if missed_or_made == 'made':
       inc(player, '2pm')
       inc(player, 'points', 2)
+    if assist != None:
+      inc(assist, 'assists')
     continue
 
   if rebound:
@@ -248,6 +251,7 @@ for event in game_data:
     inc(block.groups()[0], 'blocks')
     continue
 
+  # TODO: don't throw away data! e.g., look at all shots taken by player x immediately after timeout.
   if timeout or jump_ball:
     continue
 
@@ -265,19 +269,19 @@ for player_data in boxscore_data:
 
   player['minutes'] = player_data['minutes']
 
-  ensure_equals(player['points'], player_data['pts'], 'Point discrepancy for %s' % player_name)
-  ensure_equals(player['3pa'], player_data['tpa'], '3pa discrepancy for %s' % player_name)
-  ensure_equals(player['3pm'], player_data['tpm'], '3pm discrepancy for %s' % player_name)
-  ensure_equals(player['fta'], player_data['fta'], 'FTa discrepancy for %s' % player_name)
-  ensure_equals(player['ftm'], player_data['ftm'], 'FTm discrepancy for %s' % player_name)
-  ensure_equals(player['2pa'], player_data['fga'] - player_data['tpa'], '2pa discrepancy for %s' % player_name)
-  ensure_equals(player['2pm'], player_data['fgm'] - player_data['tpm'], '2pm discrepancy for %s' % player_name)
-  ensure_equals(player['blocks'], player_data['blk'], 'blocks discrepancy for %s' % player_name)
-  ensure_equals(player['fouls'], player_data['pf'], 'fouls discrepancy for %s' % player_name)
-  ensure_equals(player['steals'], player_data['stl'], 'steals discrepancy for %s' % player_name)
-  #[ensure_equals(player['assists'], player_data['ast'], 'assists discrepancy for %s' % player_name)
-  ensure_equals(player['oreb'], player_data['oreb'], 'oreb discrepancy for %s' % player_name)
-  ensure_equals(player['dreb'], player_data['reb'] - player_data['oreb'], 'dreb discrepancy for %s' % player_name)
+  # ensure_equals(player['points'], player_data['pts'], 'Point discrepancy for %s' % player_name)
+  # ensure_equals(player['3pa'], player_data['tpa'], '3pa discrepancy for %s' % player_name)
+  # ensure_equals(player['3pm'], player_data['tpm'], '3pm discrepancy for %s' % player_name)
+  # ensure_equals(player['fta'], player_data['fta'], 'FTa discrepancy for %s' % player_name)
+  # ensure_equals(player['ftm'], player_data['ftm'], 'FTm discrepancy for %s' % player_name)
+  # ensure_equals(player['2pa'], player_data['fga'] - player_data['tpa'], '2pa discrepancy for %s' % player_name)
+  # ensure_equals(player['2pm'], player_data['fgm'] - player_data['tpm'], '2pm discrepancy for %s' % player_name)
+  # ensure_equals(player['blocks'], player_data['blk'], 'blocks discrepancy for %s' % player_name)
+  # ensure_equals(player['fouls'], player_data['pf'], 'fouls discrepancy for %s' % player_name)
+  # ensure_equals(player['steals'], player_data['stl'], 'steals discrepancy for %s' % player_name)
+  # #[ensure_equals(player['assists'], player_data['ast'], 'assists discrepancy for %s' % player_name)
+  # ensure_equals(player['oreb'], player_data['oreb'], 'oreb discrepancy for %s' % player_name)
+  # ensure_equals(player['dreb'], player_data['reb'] - player_data['oreb'], 'dreb discrepancy for %s' % player_name)
 
 
 
@@ -301,18 +305,20 @@ for player in players:
   )
 
 
-fga = 0
-offensive_rebounds = 0
-turnovers = 0
-ft_attempts = 0
-for player in players:
-  fga = fga + players[player]['2pa'] + players[player]['3pa']
-  offensive_rebounds = offensive_rebounds + players[player]['oreb']
-  turnovers = turnovers + players[player]['turnovers']
-  ft_attempts = ft_attempts + players[player]['fta']
+def calculate_tempo(players):
+  fga = 0
+  offensive_rebounds = 0
+  turnovers = 0
+  ft_attempts = 0
+  for player in players:
+    fga = fga + players[player]['2pa'] + players[player]['3pa']
+    offensive_rebounds = offensive_rebounds + players[player]['oreb']
+    turnovers = turnovers + players[player]['turnovers']
+    ft_attempts = ft_attempts + players[player]['fta']
 
-tempo = fga - offensive_rebounds + turnovers + 0.475 * ft_attempts
-print "tempo: ", tempo / 2
+  tempo = fga - offensive_rebounds + turnovers + 0.475 * ft_attempts
+  return tempo
+  #print "tempo: ", tempo / 2
 
 
 
